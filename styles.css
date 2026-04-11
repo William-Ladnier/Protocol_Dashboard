@@ -586,6 +586,29 @@ input[type="checkbox"] {
   display: block;
 }
 
+.quick-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 4px 0 2px;
+}
+
+.quick-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.quick-link:hover {
+  transform: translateY(-1px);
+}
+
 .sticky-actions {
   position: sticky;
   bottom: 10px;

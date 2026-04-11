@@ -171,6 +171,14 @@
                       <h3>Cognitive tests</h3>
                       <p class="muted" id="cognitivePrompt">Recommended on Monday, Wednesday, and Friday.</p>
                     </div>
+                    <div class="quick-links">
+                      <a class="quick-link" href="https://us.psytoolkit.org/experiment-library/experiment_digitspan.html" target="_blank" rel="noreferrer">
+                        Open PsyToolkit digit span
+                      </a>
+                      <a class="quick-link" href="https://humanbenchmark.com/tests/reactiontime" target="_blank" rel="noreferrer">
+                        Open Human Benchmark reaction time
+                      </a>
+                    </div>
                     <label class="checkbox-row">
                       <input id="didCognitiveTestInput" name="didCognitiveTest" type="checkbox" />
                       <span>Record cognitive test data today</span>
@@ -181,7 +189,7 @@
                         <input id="reactionTimeInput" name="reactionTime" type="number" min="1" step="1" />
                       </label>
                       <label>
-                        <span>Memory score</span>
+                        <span>Digit span score</span>
                         <input id="memoryScoreInput" name="memoryScore" type="number" min="0" step="1" />
                       </label>
                     </div>
@@ -327,7 +335,7 @@
                   <canvas id="reactionChart" width="640" height="240"></canvas>
                 </article>
                 <article class="chart-card">
-                  <h3>Memory score</h3>
+                  <h3>Digit span score</h3>
                   <div class="chart-legend" id="memoryLegend"></div>
                   <canvas id="memoryChart" width="640" height="240"></canvas>
                 </article>
@@ -417,9 +425,15 @@
                 </p>
                 <h3>Working memory</h3>
                 <p>
-                  Pick one memory metric for the full experiment. Digit span is
-                  simplest; dual n-back is acceptable if you already use it and
-                  can keep conditions consistent.
+                  Use digit span as the primary memory metric. PsyToolkit's digit
+                  span task is a good fit because it returns a clear span score
+                  you can enter directly into the tracker.
+                </p>
+                <p>
+                  For this app, the recommended flow is to open the PsyToolkit
+                  digit span test in a new tab, finish the task, and enter the
+                  resulting digit span score manually. That is more reliable than
+                  trying to embed the test directly into this static dashboard.
                 </p>
                 <h3>Suggested schedule</h3>
                 <p>

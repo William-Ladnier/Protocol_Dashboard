@@ -725,7 +725,7 @@ function renderPhaseComparison(phaseAverages) {
       <p>Sleep quality: ${formatMaybeNumber(phase.metrics.sleepQuality)}</p>
       <p>Lion's mane: ${formatMaybeNumber(phase.metrics.lionsManeDose)} capsules</p>
       <p>Reaction time: ${formatMaybeNumber(phase.metrics.reactionTime)}</p>
-      <p>Memory score: ${formatMaybeNumber(phase.metrics.memoryScore)}</p>
+      <p>Digit span: ${formatMaybeNumber(phase.metrics.memoryScore)}</p>
     `;
     elements.phaseComparison.appendChild(row);
   });
@@ -820,7 +820,7 @@ function renderCharts(entries, rollingData) {
     entries,
     series: [
       {
-        label: "Memory score",
+        label: "Digit span",
         color: "#c4642f",
         values: entries.map((entry) => entry.memoryScore),
         connectAcrossGaps: true,
