@@ -25,6 +25,24 @@
         </div>
       </header>
 
+      <section class="panel profile-bar">
+        <div class="profile-bar-main">
+          <div>
+            <p class="section-kicker">Profiles</p>
+            <h2 id="activeProfileHeading">Current profile</h2>
+          </div>
+          <label class="profile-picker">
+            <span>Active profile</span>
+            <select id="profileSelect" aria-label="Active profile"></select>
+          </label>
+        </div>
+        <div class="profile-actions">
+          <button class="secondary" id="createProfileButton" type="button">New profile</button>
+          <button class="secondary" id="renameProfileButton" type="button">Rename</button>
+          <button class="secondary danger-button" id="deleteProfileButton" type="button">Delete</button>
+        </div>
+      </section>
+
       <main>
         <section class="panel tabs">
           <div class="tab-list" role="tablist" aria-label="Primary views">

@@ -30,6 +30,11 @@ const state = loadState();
 
 const elements = {
   tabs: [...document.querySelectorAll(".tab")],
+  activeProfileHeading: document.getElementById("activeProfileHeading"),
+  profileSelect: document.getElementById("profileSelect"),
+  createProfileButton: document.getElementById("createProfileButton"),
+  renameProfileButton: document.getElementById("renameProfileButton"),
+  deleteProfileButton: document.getElementById("deleteProfileButton"),
   tabPanels: {
     entry: document.getElementById("entryPanel"),
     dashboard: document.getElementById("dashboardPanel"),
@@ -117,17 +122,21 @@ function bindEvents() {
   elements.tabs.forEach((tab) => {
     tab.addEventListener("click", () => setActiveTab(tab.dataset.tab));
   });
+  elements.profileSelect.addEventListener("change", () => switchProfile(elements.profileSelect.value));
+  elements.createProfileButton.addEventListener("click", createProfileFromPrompt);
+  elements.renameProfileButton.addEventListener("click", renameActiveProfileFromPrompt);
+  elements.deleteProfileButton.addEventListener("click", deleteActiveProfile);
   elements.analysisModeButtons.forEach((button) => {
     button.addEventListener("click", () => setAnalysisMode(button.dataset.analysisMode));
   });
 
   elements.startDateInput.addEventListener("change", () => {
-    state.settings.startDate = elements.startDateInput.value;
-    state.entries = state.entries.map((entry) => {
-      const derived = deriveWeekAndPhase(entry.date, state.settings.startDate);
+    currentProfile().settings.startDate = elements.startDateInput.value;
+    currentProfile().entries = currentProfile().entries.map((entry) => {
+      const derived = deriveWeekAndPhase(entry.date, currentProfile().settings.startDate);
       return {
         ...entry,
-        startDate: state.settings.startDate,
+        startDate: currentProfile().settings.startDate,
         weekNumber: derived.weekNumber,
         phase: derived.phase,
       };
@@ -153,21 +162,42 @@ function bindEvents() {
 function loadState() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) {
+    const profile = createProfileRecord("Default profile");
     return {
-      settings: { ...DEFAULT_PROTOCOL_SETTINGS },
-      entries: [],
+      profiles: [profile],
+      activeProfileId: profile.id,
       ui: { activeTab: "entry", analysisMode: "all" },
     };
   }
 
   try {
     const parsed = JSON.parse(raw);
-    return {
+    if (Array.isArray(parsed.profiles) && parsed.profiles.length) {
+      const profiles = parsed.profiles.map(normalizeProfile);
+      const activeProfileId = profiles.some((profile) => profile.id === parsed.activeProfileId)
+        ? parsed.activeProfileId
+        : profiles[0].id;
+      return {
+        profiles,
+        activeProfileId,
+        ui: {
+          activeTab: parsed.ui?.activeTab || "entry",
+          analysisMode: parsed.ui?.analysisMode || "all",
+        },
+      };
+    }
+
+    const migratedProfile = {
+      ...createProfileRecord("Default profile"),
       settings: {
         ...DEFAULT_PROTOCOL_SETTINGS,
         ...(parsed.settings || {}),
       },
       entries: Array.isArray(parsed.entries) ? parsed.entries : [],
+    };
+    return {
+      profiles: [migratedProfile],
+      activeProfileId: migratedProfile.id,
       ui: {
         activeTab: parsed.ui?.activeTab || "entry",
         analysisMode: parsed.ui?.analysisMode || "all",
@@ -175,12 +205,50 @@ function loadState() {
     };
   } catch (error) {
     console.error("Failed to parse saved data", error);
+    const profile = createProfileRecord("Default profile");
     return {
-      settings: { ...DEFAULT_PROTOCOL_SETTINGS },
-      entries: [],
+      profiles: [profile],
+      activeProfileId: profile.id,
       ui: { activeTab: "entry", analysisMode: "all" },
     };
   }
+}
+
+function normalizeProfile(profile) {
+  return {
+    id: profile.id || createProfileId(),
+    name: profile.name || "Unnamed profile",
+    settings: {
+      ...DEFAULT_PROTOCOL_SETTINGS,
+      ...(profile.settings || {}),
+    },
+    entries: Array.isArray(profile.entries) ? profile.entries : [],
+  };
+}
+
+function createProfileId() {
+  return `profile-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function createProfileRecord(name) {
+  return {
+    id: createProfileId(),
+    name,
+    settings: { ...DEFAULT_PROTOCOL_SETTINGS },
+    entries: [],
+  };
+}
+
+function currentProfile() {
+  return state.profiles.find((profile) => profile.id === state.activeProfileId) || state.profiles[0];
+}
+
+function currentEntries() {
+  return currentProfile().entries;
+}
+
+function currentSettings() {
+  return currentProfile().settings;
 }
 
 function saveState() {
@@ -188,7 +256,8 @@ function saveState() {
 }
 
 function hydrateFormFromState() {
-  elements.startDateInput.value = state.settings.startDate;
+  renderProfileControls();
+  elements.startDateInput.value = currentSettings().startDate;
   elements.dateInput.value = formatDateInput(new Date());
   resetFormToDate();
   setActiveTab(state.ui.activeTab || "entry");
@@ -199,7 +268,7 @@ function resetFormToDate() {
   const currentDate = elements.dateInput.value || formatDateInput(new Date());
   elements.entryForm.reset();
   elements.dateInput.value = currentDate;
-  elements.startDateInput.value = state.settings.startDate;
+  elements.startDateInput.value = currentSettings().startDate;
   setRangeValue(elements.morningEnergyInput, 5);
   setRangeValue(elements.middayEnergyInput, 5);
   setRangeValue(elements.lateAfternoonEnergyInput, 5);
@@ -230,6 +299,87 @@ function setAnalysisMode(mode) {
     button.classList.toggle("active", button.dataset.analysisMode === mode);
   });
   saveState();
+  renderAll();
+}
+
+function renderProfileControls() {
+  const profile = currentProfile();
+  elements.activeProfileHeading.textContent = profile ? profile.name : "Current profile";
+  elements.profileSelect.innerHTML = "";
+  state.profiles.forEach((item) => {
+    const option = document.createElement("option");
+    option.value = item.id;
+    option.textContent = item.name;
+    option.selected = item.id === state.activeProfileId;
+    elements.profileSelect.appendChild(option);
+  });
+  elements.deleteProfileButton.disabled = state.profiles.length <= 1;
+}
+
+function switchProfile(profileId) {
+  if (!state.profiles.some((profile) => profile.id === profileId)) {
+    return;
+  }
+  state.activeProfileId = profileId;
+  saveState();
+  hydrateFormFromState();
+  renderAll();
+}
+
+function askForProfileName(initialValue = "") {
+  const value = window.prompt("Profile name", initialValue)?.trim();
+  if (!value) {
+    return null;
+  }
+  return value.slice(0, 40);
+}
+
+function createProfileFromPrompt() {
+  const name = askForProfileName("");
+  if (!name) {
+    return;
+  }
+  if (state.profiles.some((profile) => profile.name.toLowerCase() === name.toLowerCase())) {
+    window.alert("A profile with that name already exists.");
+    return;
+  }
+  const profile = createProfileRecord(name);
+  state.profiles.push(profile);
+  state.activeProfileId = profile.id;
+  saveState();
+  hydrateFormFromState();
+  renderAll();
+}
+
+function renameActiveProfileFromPrompt() {
+  const profile = currentProfile();
+  const name = askForProfileName(profile.name);
+  if (!name) {
+    return;
+  }
+  if (state.profiles.some((item) => item.id !== profile.id && item.name.toLowerCase() === name.toLowerCase())) {
+    window.alert("A profile with that name already exists.");
+    return;
+  }
+  profile.name = name;
+  saveState();
+  renderProfileControls();
+}
+
+function deleteActiveProfile() {
+  if (state.profiles.length <= 1) {
+    window.alert("At least one profile must remain.");
+    return;
+  }
+  const profile = currentProfile();
+  const confirmed = window.confirm(`Delete profile "${profile.name}" and all of its data?`);
+  if (!confirmed) {
+    return;
+  }
+  state.profiles = state.profiles.filter((item) => item.id !== profile.id);
+  state.activeProfileId = state.profiles[0].id;
+  saveState();
+  hydrateFormFromState();
   renderAll();
 }
 
@@ -271,7 +421,7 @@ function updateDerivedEntryMeta() {
   const startDate = elements.startDateInput.value;
   const selectedDate = elements.dateInput.value;
   const derived = deriveWeekAndPhase(selectedDate, startDate);
-  const existing = state.entries.find((entry) => entry.date === selectedDate);
+  const existing = currentEntries().find((entry) => entry.date === selectedDate);
   const recommended = isRecommendedCognitiveTestDay(selectedDate);
   const needsSupplement = derived.phase === "Intervention";
   const dateRelation = getDateRelationLabel(selectedDate);
@@ -371,10 +521,10 @@ function handleSaveEntry(event) {
   event.preventDefault();
   const formData = new FormData(elements.entryForm);
   const date = formData.get("date");
-  const derived = deriveWeekAndPhase(date, state.settings.startDate);
+  const derived = deriveWeekAndPhase(date, currentSettings().startDate);
   const entry = {
     date,
-    startDate: state.settings.startDate,
+    startDate: currentSettings().startDate,
     weekNumber: derived.weekNumber,
     phase: derived.phase,
     lionsManeDose: toNumberOrNull(formData.get("lionsManeDose")),
@@ -401,7 +551,7 @@ function handleSaveEntry(event) {
     createdAt: new Date().toISOString(),
   };
 
-  state.entries = upsertEntry(state.entries, entry).sort((a, b) => a.date.localeCompare(b.date));
+  currentProfile().entries = upsertEntry(currentEntries(), entry).sort((a, b) => a.date.localeCompare(b.date));
   saveState();
   loadEntryForSelectedDate();
   renderAll();
@@ -430,7 +580,7 @@ function setActiveTags(tags) {
 
 function loadEntryForSelectedDate() {
   const selectedDate = elements.dateInput.value;
-  const existing = state.entries.find((entry) => entry.date === selectedDate);
+  const existing = currentEntries().find((entry) => entry.date === selectedDate);
 
   if (!existing) {
     const preservedDate = selectedDate;
@@ -440,7 +590,7 @@ function loadEntryForSelectedDate() {
     return;
   }
 
-  elements.startDateInput.value = state.settings.startDate;
+  elements.startDateInput.value = currentSettings().startDate;
   elements.dateInput.value = existing.date;
   elements.lionsManeDoseInput.value = existing.lionsManeDose ?? "";
   setRangeValue(elements.morningEnergyInput, existing.morningEnergy ?? 5);
@@ -462,7 +612,8 @@ function loadEntryForSelectedDate() {
 }
 
 function renderAll() {
-  const sortedEntries = [...state.entries].sort((a, b) => a.date.localeCompare(b.date));
+  renderProfileControls();
+  const sortedEntries = [...currentEntries()].sort((a, b) => a.date.localeCompare(b.date));
   const allAggregates = buildAggregates(sortedEntries);
   const cleanEntries = sortedEntries.filter(isCleanEntry);
   const cleanAggregates = buildAggregates(cleanEntries);
@@ -533,7 +684,7 @@ function renderRecentEntries(entries) {
       `Fog ${formatMaybeNumber(entry.brainFog)}`,
       `Var ${formatMaybeNumber(entry.energyVariability)}`,
       entry.didCognitiveTest && entry.reactionTime ? `RT ${entry.reactionTime} ms` : null,
-      entry.didCognitiveTest && entry.memoryScore !== null ? `Memory ${entry.memoryScore}` : null,
+      entry.didCognitiveTest && entry.memoryScore !== null ? `Digit ${entry.memoryScore}` : null,
     ]
       .filter(Boolean)
       .join(" • ");
@@ -1085,9 +1236,18 @@ function toNumberOrNull(value) {
 }
 
 function exportJson() {
+  const profile = currentProfile();
   downloadFile(
-    "protocol-dashboard-data.json",
-    JSON.stringify({ ...state, exportedAt: new Date().toISOString() }, null, 2),
+    `${slugifyName(profile.name)}-protocol-dashboard.json`,
+    JSON.stringify(
+      {
+        exportType: "protocol-dashboard-profile",
+        exportedAt: new Date().toISOString(),
+        profile,
+      },
+      null,
+      2,
+    ),
     "application/json",
   );
 }
@@ -1115,7 +1275,7 @@ function exportCsv() {
     "notes",
   ];
 
-  const rows = state.entries.map((entry) =>
+  const rows = currentEntries().map((entry) =>
     headers
       .map((header) => {
         const value = header === "anomalyTags" ? entry.anomalyTags.join("|") : entry[header];
@@ -1124,7 +1284,7 @@ function exportCsv() {
       .join(","),
   );
   const csv = [headers.join(","), ...rows].join("\n");
-  downloadFile("protocol-dashboard-data.csv", csv, "text/csv;charset=utf-8");
+  downloadFile(`${slugifyName(currentProfile().name)}-protocol-dashboard.csv`, csv, "text/csv;charset=utf-8");
 }
 
 function importJson(event) {
@@ -1136,11 +1296,31 @@ function importJson(event) {
   reader.onload = () => {
     try {
       const parsed = JSON.parse(reader.result);
-      state.settings = {
-        ...DEFAULT_PROTOCOL_SETTINGS,
-        ...(parsed.settings || {}),
-      };
-      state.entries = Array.isArray(parsed.entries) ? parsed.entries : [];
+      if (parsed.exportType === "protocol-dashboard-profile" && parsed.profile) {
+        const imported = normalizeProfile(parsed.profile);
+        imported.id = createProfileId();
+        imported.name = uniqueProfileName(imported.name);
+        state.profiles.push(imported);
+        state.activeProfileId = imported.id;
+      } else if (Array.isArray(parsed.profiles)) {
+        state.profiles = parsed.profiles.map(normalizeProfile);
+        if (!state.profiles.length) {
+          const profile = createProfileRecord("Default profile");
+          state.profiles = [profile];
+          state.activeProfileId = profile.id;
+        } else if (state.profiles.some((profile) => profile.id === parsed.activeProfileId)) {
+          state.activeProfileId = parsed.activeProfileId;
+        } else if (!state.profiles.some((profile) => profile.id === state.activeProfileId)) {
+          state.activeProfileId = state.profiles[0].id;
+        }
+      } else {
+        const profile = currentProfile();
+        profile.settings = {
+          ...DEFAULT_PROTOCOL_SETTINGS,
+          ...(parsed.settings || {}),
+        };
+        profile.entries = Array.isArray(parsed.entries) ? parsed.entries : [];
+      }
       saveState();
       hydrateFormFromState();
       renderAll();
@@ -1166,6 +1346,21 @@ function downloadFile(filename, content, mimeType) {
 function csvEscape(value) {
   const stringValue = String(value).replaceAll('"', '""');
   return `"${stringValue}"`;
+}
+
+function uniqueProfileName(baseName) {
+  let candidate = baseName;
+  let index = 2;
+  const existing = new Set(state.profiles.map((profile) => profile.name.toLowerCase()));
+  while (existing.has(candidate.toLowerCase())) {
+    candidate = `${baseName} (${index})`;
+    index += 1;
+  }
+  return candidate;
+}
+
+function slugifyName(value) {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "profile";
 }
 
 function clampOneDecimal(value) {
