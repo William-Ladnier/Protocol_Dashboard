@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Protocol Dashboard</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">12-Week Cognitive &amp; Inflammation Self-Experiment</p>
+          <h1>Protocol Dashboard</h1>
+          <p class="hero-copy">
+            Track daily signals, compare baseline against intervention, and
+            watch for washout regression without adding friction to your day.
+          </p>
+        </div>
+        <div class="hero-actions">
+          <button class="secondary" id="exportJsonButton" type="button">Export JSON</button>
+          <button class="secondary" id="exportCsvButton" type="button">Export CSV</button>
+          <label class="secondary file-button" for="importFileInput">Import JSON</label>
+          <input id="importFileInput" type="file" accept=".json,application/json" hidden />
+        </div>
+      </header>
+
+      <main>
+        <section class="panel tabs">
+          <div class="tab-list" role="tablist" aria-label="Primary views">
+            <button class="tab active" data-tab="entry" type="button">Daily Entry</button>
+            <button class="tab" data-tab="dashboard" type="button">Dashboard</button>
+            <button class="tab" data-tab="protocol" type="button">Protocol</button>
+          </div>
+        </section>
+
+        <section class="tab-panel active" id="entryPanel">
+          <div class="grid two-up">
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <p class="section-kicker">Daily Log</p>
+                  <h2>Fast entry</h2>
+                </div>
+                <p class="muted" id="entryMeta">Week 0 • Baseline</p>
+              </div>
+
+              <form id="entryForm" class="entry-form">
+                <div class="field-group compact-grid">
+                  <label>
+                    <span>Date</span>
+                    <input id="dateInput" name="date" type="date" required />
+                  </label>
+                  <label>
+                    <span>Experiment start</span>
+                    <input id="startDateInput" name="startDate" type="date" required />
+                  </label>
+                  <label>
+                    <span>Week</span>
+                    <input id="weekNumberInput" type="text" disabled />
+                  </label>
+                  <label>
+                    <span>Phase</span>
+                    <input id="phaseInput" type="text" disabled />
+                  </label>
+                </div>
+
+                <section class="entry-brief" id="entryBrief">
+                  <div class="entry-brief-top">
+                    <div>
+                      <p class="section-kicker">Selected day</p>
+                      <h3 id="entryBriefTitle">Ready to log</h3>
+                    </div>
+                    <p class="pill neutral-pill" id="entryStatusPill">New entry</p>
+                  </div>
+                  <p class="muted" id="entryBriefSummary">
+                    Core daily signals are ready to log.
+                  </p>
+                  <div class="brief-checklist" id="briefChecklist"></div>
+                </section>
+
+                <details class="entry-section" open>
+                  <summary class="entry-section-summary">
+                    <div>
+                      <strong>Morning setup</strong>
+                      <span>Prior night's sleep, morning signals, and supplement check-in.</span>
+                    </div>
+                  </summary>
+                  <div class="entry-section-body field-group">
+                    <div class="phase-note" id="supplementNote"></div>
+                    <div class="compact-grid" id="supplementFields">
+                      <label>
+                        <span>Lion's mane dose (capsules)</span>
+                        <input id="lionsManeDoseInput" name="lionsManeDose" type="number" min="0" step="1" />
+                      </label>
+                      <label class="slider-field">
+                        <span>Morning energy</span>
+                        <input id="morningEnergyInput" name="morningEnergy" type="range" min="1" max="10" value="5" />
+                        <output for="morningEnergyInput">5</output>
+                      </label>
+                      <label class="slider-field">
+                        <span>Morning joint stiffness</span>
+                        <input id="jointStiffnessInput" name="jointStiffness" type="range" min="1" max="10" value="5" />
+                        <output for="jointStiffnessInput">5</output>
+                      </label>
+                      <label>
+                        <span>Sleep duration (hours)</span>
+                        <input id="sleepDurationInput" name="sleepDuration" type="number" min="0" max="24" step="0.1" />
+                      </label>
+                      <label class="slider-field">
+                        <span>Sleep quality</span>
+                        <input id="sleepQualityInput" name="sleepQuality" type="range" min="1" max="10" value="8" />
+                        <output for="sleepQualityInput">8</output>
+                      </label>
+                      <label>
+                        <span>Awakenings</span>
+                        <input id="awakeningsInput" name="awakenings" type="number" min="0" step="1" />
+                      </label>
+                    </div>
+                  </div>
+                </details>
+
+                <details class="entry-section" open>
+                  <summary class="entry-section-summary">
+                    <div>
+                      <strong>Midday check-in</strong>
+                      <span>Energy stability during the workday.</span>
+                    </div>
+                  </summary>
+                  <div class="entry-section-body field-group">
+                    <div class="slider-grid">
+                      <label class="slider-field">
+                        <span>Midday energy</span>
+                        <input id="middayEnergyInput" name="middayEnergy" type="range" min="1" max="10" value="5" />
+                        <output for="middayEnergyInput">5</output>
+                      </label>
+                      <label class="slider-field">
+                        <span>Late afternoon energy</span>
+                        <input id="lateAfternoonEnergyInput" name="lateAfternoonEnergy" type="range" min="1" max="10" value="5" />
+                        <output for="lateAfternoonEnergyInput">5</output>
+                      </label>
+                    </div>
+                  </div>
+                </details>
+
+                <details class="entry-section" open>
+                  <summary class="entry-section-summary">
+                    <div>
+                      <strong>Evening wrap-up</strong>
+                      <span>Brain fog, recovery, workout, and optional cognitive tests.</span>
+                    </div>
+                  </summary>
+                  <div class="entry-section-body field-group">
+                    <div class="compact-grid">
+                      <label class="slider-field">
+                        <span>Brain fog score</span>
+                        <input id="brainFogInput" name="brainFog" type="range" min="1" max="10" value="5" />
+                        <output for="brainFogInput">5</output>
+                      </label>
+                      <label class="slider-field">
+                        <span>Recovery quality</span>
+                        <input id="recoveryQualityInput" name="recoveryQuality" type="range" min="1" max="10" value="5" />
+                        <output for="recoveryQualityInput">5</output>
+                      </label>
+                      <label class="checkbox-card">
+                        <input id="workoutPerformedInput" name="workoutPerformed" type="checkbox" />
+                        <span>Workout performed</span>
+                      </label>
+                    </div>
+                    <div class="group-title-row sub-group-title">
+                      <h3>Cognitive tests</h3>
+                      <p class="muted" id="cognitivePrompt">Recommended on Monday, Wednesday, and Friday.</p>
+                    </div>
+                    <label class="checkbox-row">
+                      <input id="didCognitiveTestInput" name="didCognitiveTest" type="checkbox" />
+                      <span>Record cognitive test data today</span>
+                    </label>
+                    <div class="compact-grid conditional-section" id="cognitiveFields">
+                      <label>
+                        <span>Reaction time (ms)</span>
+                        <input id="reactionTimeInput" name="reactionTime" type="number" min="1" step="1" />
+                      </label>
+                      <label>
+                        <span>Memory score</span>
+                        <input id="memoryScoreInput" name="memoryScore" type="number" min="0" step="1" />
+                      </label>
+                    </div>
+                  </div>
+                </details>
+
+                <details class="entry-section" id="notesSection">
+                  <summary class="entry-section-summary">
+                    <div>
+                      <strong>Notes & anomalies</strong>
+                      <span>Optional context for stress, illness, travel, or anything unusual.</span>
+                    </div>
+                  </summary>
+                  <div class="entry-section-body field-group">
+                    <div class="tag-grid" id="tagGroup"></div>
+                    <label>
+                      <span>Notes</span>
+                      <textarea id="notesInput" name="notes" rows="4" placeholder="Stress, illness, travel, unusual diet, work schedule changes..."></textarea>
+                    </label>
+                  </div>
+                </details>
+
+                <div class="button-row sticky-actions">
+                  <button class="primary" type="submit">Save entry</button>
+                  <button class="secondary" id="resetTodayButton" type="button">Reset form</button>
+                </div>
+              </form>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <p class="section-kicker">Today</p>
+                  <h2>Experiment status</h2>
+                </div>
+                <p class="pill" id="entriesCountPill">0 entries</p>
+              </div>
+
+              <div class="stat-grid">
+                <article class="stat-card">
+                  <p>Current phase</p>
+                  <strong id="currentPhaseStat">Baseline</strong>
+                </article>
+                <article class="stat-card">
+                  <p>Today’s week</p>
+                  <strong id="currentWeekStat">0</strong>
+                </article>
+                <article class="stat-card">
+                  <p>Energy variability</p>
+                  <strong id="energyVariabilityStat">0.0</strong>
+                </article>
+                <article class="stat-card">
+                  <p>Recommended cognitive test</p>
+                  <strong id="testDayStat">No</strong>
+                </article>
+                <article class="stat-card">
+                  <p>Selected date status</p>
+                  <strong id="selectedDateStatusStat">Not saved</strong>
+                </article>
+              </div>
+
+              <section class="mini-log">
+                <div class="group-title-row">
+                  <h3>Recent entries</h3>
+                  <p class="muted">Newest first</p>
+                </div>
+                <div id="recentEntries" class="recent-entries empty-state">
+                  No entries yet.
+                </div>
+              </section>
+            </section>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="dashboardPanel">
+          <div class="grid dashboard-grid">
+            <section class="panel span-two">
+              <div class="panel-header">
+                <div>
+                  <p class="section-kicker">Analysis Set</p>
+                  <h2>All days vs clean days</h2>
+                </div>
+              </div>
+              <div class="analysis-toolbar">
+                <div class="segmented-control" id="analysisModeControl">
+                  <button class="segmented-button active" data-analysis-mode="all" type="button">All days</button>
+                  <button class="segmented-button" data-analysis-mode="clean" type="button">Clean days only</button>
+                </div>
+                <p class="muted" id="analysisModeHelp">
+                  Clean days exclude any entry tagged with an anomaly such as poor sleep, illness, travel, or schedule disruption.
+                </p>
+              </div>
+              <div class="comparison-strip" id="analysisComparisonStrip"></div>
+            </section>
+
+            <section class="panel span-two">
+              <div class="panel-header">
+                <div>
+                  <p class="section-kicker">Outcome</p>
+                  <h2>Success evaluation</h2>
+                </div>
+                <p class="pill" id="classificationPill">Waiting for baseline data</p>
+              </div>
+              <div class="evaluation-grid" id="evaluationGrid"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <p class="section-kicker">Phase averages</p>
+                  <h2>Comparison snapshot</h2>
+                </div>
+              </div>
+              <div id="phaseComparison" class="phase-comparison"></div>
+            </section>
+
+            <section class="panel span-two">
+              <div class="panel-header">
+                <div>
+                  <p class="section-kicker">Charts</p>
+                  <h2>Trends with phase overlay</h2>
+                </div>
+              </div>
+              <div class="chart-grid">
+                <article class="chart-card">
+                  <h3>Brain fog</h3>
+                  <div class="chart-legend" id="brainFogLegend"></div>
+                  <canvas id="brainFogChart" width="640" height="240"></canvas>
+                </article>
+                <article class="chart-card">
+                  <h3>Energy levels</h3>
+                  <div class="chart-legend" id="energyLegend"></div>
+                  <canvas id="energyChart" width="640" height="240"></canvas>
+                </article>
+                <article class="chart-card">
+                  <h3>Energy variability</h3>
+                  <div class="chart-legend" id="variabilityLegend"></div>
+                  <canvas id="variabilityChart" width="640" height="240"></canvas>
+                </article>
+                <article class="chart-card">
+                  <h3>Reaction time</h3>
+                  <div class="chart-legend" id="reactionLegend"></div>
+                  <canvas id="reactionChart" width="640" height="240"></canvas>
+                </article>
+                <article class="chart-card">
+                  <h3>Memory score</h3>
+                  <div class="chart-legend" id="memoryLegend"></div>
+                  <canvas id="memoryChart" width="640" height="240"></canvas>
+                </article>
+                <article class="chart-card">
+                  <h3>Sleep</h3>
+                  <div class="chart-legend" id="sleepLegend"></div>
+                  <canvas id="sleepChart" width="640" height="240"></canvas>
+                </article>
+                <article class="chart-card">
+                  <h3>Recovery / inflammation</h3>
+                  <div class="chart-legend" id="inflammationLegend"></div>
+                  <canvas id="inflammationChart" width="640" height="240"></canvas>
+                </article>
+              </div>
+            </section>
+
+            <section class="panel span-two">
+              <div class="panel-header">
+                <div>
+                  <p class="section-kicker">Weekly summary</p>
+                  <h2>Averages by week</h2>
+                </div>
+              </div>
+              <div class="table-scroll">
+                <table id="weeklyTable">
+                  <thead>
+                    <tr>
+                      <th>Week</th>
+                      <th>Phase</th>
+                      <th>Brain fog</th>
+                      <th>Energy AM</th>
+                      <th>Energy Mid</th>
+                      <th>Energy PM</th>
+                      <th>Variability</th>
+                      <th>Sleep quality</th>
+                      <th>Recovery</th>
+                      <th>Joint stiffness</th>
+                      <th>Reaction</th>
+                      <th>Memory</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="protocolPanel">
+          <div class="grid two-up">
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <p class="section-kicker">Protocol</p>
+                  <h2>Experiment structure</h2>
+                </div>
+              </div>
+              <div class="protocol-copy">
+                <p>
+                  The tracker follows your defined schedule exactly: weeks
+                  <strong>0-2 baseline</strong>, <strong>3-10 intervention</strong>,
+                  and <strong>11-12 washout</strong>. That produces week labels
+                  0 through 12, which is 13 labeled weeks in the app.
+                </p>
+                <ol>
+                  <li>Keep medication timing, caffeine timing, creatine, exercise cadence, and sleep schedule as stable as possible.</li>
+                  <li>Record prior night's sleep during the morning check-in, then log energy, brain fog, recovery, and joint stiffness across the day.</li>
+                  <li>Run cognitive tests three times per week using the same tools, same device, and roughly the same time window.</li>
+                  <li>Use notes and anomaly tags whenever illness, travel, poor sleep, or schedule disruption could confound a result.</li>
+                  <li>Interpret the intervention only after comparing against baseline and then checking for regression in washout.</li>
+                </ol>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <p class="section-kicker">Testing cadence</p>
+                  <h2>Recommended measurement rules</h2>
+                </div>
+              </div>
+              <div class="protocol-copy">
+                <h3>Reaction time</h3>
+                <p>
+                  Use Human Benchmark or another fixed reaction test. Run
+                  three trials on test days and store the average milliseconds.
+                </p>
+                <h3>Working memory</h3>
+                <p>
+                  Pick one memory metric for the full experiment. Digit span is
+                  simplest; dual n-back is acceptable if you already use it and
+                  can keep conditions consistent.
+                </p>
+                <h3>Suggested schedule</h3>
+                <p>
+                  Monday, Wednesday, and Friday are the default recommended test
+                  days in the app. You can still log cognitive data on any day.
+                </p>
+                <h3>Lion's mane schedule</h3>
+                <p>
+                  The app prefills capsules by protocol week: 0 for baseline,
+                  2 daily for weeks 3-4, 4 daily for weeks 5-10 with a split
+                  dose, and 0 again for washout.
+                </p>
+                <h3>Backup workflow</h3>
+                <p>
+                  Export JSON regularly and commit the snapshot into your repo if
+                  you want a versioned record without giving up local-only daily use.
+                </p>
+              </div>
+            </section>
+
+            <section class="panel span-two">
+              <div class="panel-header">
+                <div>
+                  <p class="section-kicker">Fixed variables</p>
+                  <h2>Consistency checklist</h2>
+                </div>
+              </div>
+              <div class="checklist-grid">
+                <article class="check-card">
+                  <p>Medication</p>
+                  <strong>Keep timing and dose fixed</strong>
+                </article>
+                <article class="check-card">
+                  <p>Caffeine</p>
+                  <strong>~180 mg around 1 hour after waking</strong>
+                </article>
+                <article class="check-card">
+                  <p>Creatine</p>
+                  <strong>5 g daily, unchanged</strong>
+                </article>
+                <article class="check-card">
+                  <p>Exercise</p>
+                  <strong>Roughly 5x per week, stable pattern</strong>
+                </article>
+                <article class="check-card">
+                  <p>Sleep</p>
+                  <strong>Aim to keep schedule and duration stable</strong>
+                </article>
+                <article class="check-card">
+                  <p>Interpretation</p>
+                  <strong>Look for improvement plus washout regression</strong>
+                </article>
+              </div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <template id="recentEntryTemplate">
+      <article class="recent-entry-card">
+        <div class="recent-entry-top">
+          <strong data-date></strong>
+          <span data-phase></span>
+        </div>
+        <p data-summary></p>
+      </article>
+    </template>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
