@@ -1,0 +1,33 @@
+{
+  "id": "profile-xeuij1j0",
+  "name": "Cyndi",
+  "settings": {
+    "startDate": "2026-04-12"
+  },
+  "entries": [
+    {
+      "date": "2026-04-12",
+      "startDate": "2026-04-12",
+      "weekNumber": 0,
+      "phase": "Baseline",
+      "lionsManeDose": null,
+      "morningEnergy": 10,
+      "middayEnergy": 6,
+      "lateAfternoonEnergy": 5,
+      "energyVariability": 5,
+      "brainFog": 3,
+      "didCognitiveTest": true,
+      "reactionTime": 324,
+      "memoryScore": 5,
+      "sleepDuration": 8,
+      "sleepQuality": 8,
+      "awakenings": 1,
+      "workoutPerformed": false,
+      "recoveryQuality": 5,
+      "jointStiffness": 3,
+      "anomalyTags": [],
+      "notes": "",
+      "createdAt": "2026-04-12T23:16:09.011Z"
+    }
+  ]
+}
