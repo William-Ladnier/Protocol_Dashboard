@@ -94,8 +94,7 @@ const elements = {
     sleep: document.getElementById("sleepLegend"),
     inflammation: document.getElementById("inflammationLegend"),
   },
-  exportJsonButton: document.getElementById("exportJsonButton"),
-  exportCsvButton: document.getElementById("exportCsvButton"),
+  exportDataButton: document.getElementById("exportDataButton"),
   importFileInput: document.getElementById("importFileInput"),
   charts: {
     brainFog: document.getElementById("brainFogChart"),
@@ -154,8 +153,7 @@ function bindEvents() {
   elements.didCognitiveTestInput.addEventListener("change", updateCognitiveVisibility);
   elements.entryForm.addEventListener("submit", handleSaveEntry);
   elements.resetTodayButton.addEventListener("click", resetFormToDate);
-  elements.exportJsonButton.addEventListener("click", exportJson);
-  elements.exportCsvButton.addEventListener("click", exportCsv);
+  elements.exportDataButton.addEventListener("click", exportJson);
   elements.importFileInput.addEventListener("change", importJson);
 }
 
@@ -1252,41 +1250,6 @@ function exportJson() {
   );
 }
 
-function exportCsv() {
-  const headers = [
-    "date",
-    "weekNumber",
-    "phase",
-    "lionsManeDose",
-    "morningEnergy",
-    "middayEnergy",
-    "lateAfternoonEnergy",
-    "energyVariability",
-    "brainFog",
-    "reactionTime",
-    "memoryScore",
-    "sleepDuration",
-    "sleepQuality",
-    "awakenings",
-    "workoutPerformed",
-    "recoveryQuality",
-    "jointStiffness",
-    "anomalyTags",
-    "notes",
-  ];
-
-  const rows = currentEntries().map((entry) =>
-    headers
-      .map((header) => {
-        const value = header === "anomalyTags" ? entry.anomalyTags.join("|") : entry[header];
-        return csvEscape(value ?? "");
-      })
-      .join(","),
-  );
-  const csv = [headers.join(","), ...rows].join("\n");
-  downloadFile(`${slugifyName(currentProfile().name)}-protocol-dashboard.csv`, csv, "text/csv;charset=utf-8");
-}
-
 function importJson(event) {
   const file = event.target.files?.[0];
   if (!file) {
@@ -1298,10 +1261,31 @@ function importJson(event) {
       const parsed = JSON.parse(reader.result);
       if (parsed.exportType === "protocol-dashboard-profile" && parsed.profile) {
         const imported = normalizeProfile(parsed.profile);
-        imported.id = createProfileId();
-        imported.name = uniqueProfileName(imported.name);
-        state.profiles.push(imported);
-        state.activeProfileId = imported.id;
+        const existingMatch = state.profiles.find((profile) => profile.id === imported.id);
+        if (existingMatch) {
+          const shouldMerge = window.confirm(
+            `A matching profile named "${existingMatch.name}" already exists.\n\nPress OK to merge imported entries into that profile, or Cancel to import this as a new profile.`,
+          );
+
+          if (shouldMerge) {
+            existingMatch.name = imported.name || existingMatch.name;
+            existingMatch.settings = {
+              ...existingMatch.settings,
+              ...imported.settings,
+            };
+            existingMatch.entries = mergeEntriesByDate(existingMatch.entries, imported.entries);
+            state.activeProfileId = existingMatch.id;
+          } else {
+            imported.id = createProfileId();
+            imported.name = uniqueProfileName(imported.name);
+            state.profiles.push(imported);
+            state.activeProfileId = imported.id;
+          }
+        } else {
+          imported.name = uniqueProfileName(imported.name);
+          state.profiles.push(imported);
+          state.activeProfileId = imported.id;
+        }
       } else if (Array.isArray(parsed.profiles)) {
         state.profiles = parsed.profiles.map(normalizeProfile);
         if (!state.profiles.length) {
@@ -1343,11 +1327,6 @@ function downloadFile(filename, content, mimeType) {
   URL.revokeObjectURL(url);
 }
 
-function csvEscape(value) {
-  const stringValue = String(value).replaceAll('"', '""');
-  return `"${stringValue}"`;
-}
-
 function uniqueProfileName(baseName) {
   let candidate = baseName;
   let index = 2;
@@ -1361,6 +1340,14 @@ function uniqueProfileName(baseName) {
 
 function slugifyName(value) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "profile";
+}
+
+function mergeEntriesByDate(existingEntries, importedEntries) {
+  const merged = new Map(existingEntries.map((entry) => [entry.date, entry]));
+  importedEntries.forEach((entry) => {
+    merged.set(entry.date, entry);
+  });
+  return Array.from(merged.values()).sort((a, b) => a.date.localeCompare(b.date));
 }
 
 function clampOneDecimal(value) {

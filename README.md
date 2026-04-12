@@ -14,7 +14,7 @@ Local-first static dashboard for a structured lion's mane self-experiment.
 - Weekly summaries and phase comparisons
 - Trend charts for cognition, energy, sleep, and recovery/inflammation with phase overlays
 - Built-in success evaluation based on your experiment rules
-- JSON and CSV export for backup and analysis
+- Importable/exportable profile JSON for backup and transfer between devices
 
 ## Files
 
@@ -29,7 +29,7 @@ Local-first static dashboard for a structured lion's mane self-experiment.
 3. Set that profile's experiment start date.
 4. Use the `Daily Entry` tab on phone or desktop.
 5. Review outcomes in the `Dashboard` tab.
-6. Export JSON regularly if you want versioned backups in GitHub.
+6. Use `Export data` regularly if you want versioned backups in GitHub.
 
 ## Mobile workflow
 
@@ -40,4 +40,8 @@ For iPhone use, the simplest path is to open the static app in Safari and option
 - The app follows your provided week labels `0-12`, which creates 13 labeled weeks.
 - Cognitive testing defaults to Monday, Wednesday, and Friday, but you can log results on any day.
 - Daily data remains local to the browser until you explicitly export it.
-- JSON exports now export the active profile, and importing a profile JSON adds it as a separate profile in the app.
+- `Export data` exports the active profile as JSON.
+- `Import data` supports two outcomes when importing a profile JSON:
+- If the hidden profile ID matches an existing profile, you can merge the imported entries into that profile.
+- If you choose not to merge, the import is added as a new profile instead.
+- Profile merges are additive by date: new dates are added, and matching dates are updated by the imported entry.
