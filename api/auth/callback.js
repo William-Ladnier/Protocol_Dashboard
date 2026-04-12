@@ -1,4 +1,4 @@
-import { writeSession } from "../lib/session.js";
+import { writeSession } from "../../lib/session.js";
 
 export default async function handler(req, res) {
   const code = req.query.code;
@@ -46,4 +46,3 @@ export default async function handler(req, res) {
   res.writeHead(302, { Location: "/" });
   res.end();
 }
-
