@@ -1,8 +1,57 @@
 {
   "id": "profile-vs42rmw4",
-  "name": "Default profile",
+  "name": "Will",
   "settings": {
-    "startDate": "2026-04-12"
+    "startDate": "2026-04-11"
   },
-  "entries": []
+  "entries": [
+    {
+      "date": "2026-04-11",
+      "startDate": "2026-04-11",
+      "weekNumber": 0,
+      "phase": "Baseline",
+      "lionsManeDose": null,
+      "morningEnergy": 6,
+      "middayEnergy": 6,
+      "lateAfternoonEnergy": 6,
+      "energyVariability": 0,
+      "brainFog": 6,
+      "didCognitiveTest": true,
+      "reactionTime": 289,
+      "memoryScore": 5,
+      "sleepDuration": 7,
+      "sleepQuality": 7,
+      "awakenings": 1,
+      "workoutPerformed": false,
+      "recoveryQuality": 5,
+      "jointStiffness": 4,
+      "anomalyTags": [],
+      "notes": "",
+      "createdAt": "2026-04-12T22:43:50.312Z"
+    },
+    {
+      "date": "2026-04-12",
+      "startDate": "2026-04-11",
+      "weekNumber": 0,
+      "phase": "Baseline",
+      "lionsManeDose": null,
+      "morningEnergy": 6,
+      "middayEnergy": 6,
+      "lateAfternoonEnergy": 6,
+      "energyVariability": 0,
+      "brainFog": 7,
+      "didCognitiveTest": false,
+      "reactionTime": null,
+      "memoryScore": null,
+      "sleepDuration": 5,
+      "sleepQuality": 5,
+      "awakenings": 1,
+      "workoutPerformed": false,
+      "recoveryQuality": 5,
+      "jointStiffness": 4,
+      "anomalyTags": [],
+      "notes": "",
+      "createdAt": "2026-04-12T22:44:29.461Z"
+    }
+  ]
 }
