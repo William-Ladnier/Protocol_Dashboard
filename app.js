@@ -1410,4 +1410,30 @@ window.protocolDashboardApp = {
   getProfiles() {
     return structuredClone(state.profiles);
   },
+  importRemoteProfile(profilePayload) {
+    const imported = normalizeProfile(profilePayload);
+    const existing = state.profiles.find((profile) => profile.id === imported.id);
+
+    if (existing) {
+      existing.name = imported.name || existing.name;
+      existing.settings = {
+        ...existing.settings,
+        ...imported.settings,
+      };
+      existing.entries = mergeEntriesByDate(existing.entries || [], imported.entries || []);
+      state.activeProfileId = existing.id;
+      saveState();
+      hydrateFormFromState();
+      renderAll();
+      return true;
+    }
+
+    imported.name = uniqueProfileName(imported.name);
+    state.profiles.push(imported);
+    state.activeProfileId = imported.id;
+    saveState();
+    hydrateFormFromState();
+    renderAll();
+    return true;
+  },
 };

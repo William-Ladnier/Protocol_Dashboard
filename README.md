@@ -50,6 +50,12 @@ To finish that v2 path, you still need to:
 3. Deploy the app to a platform that supports serverless functions, such as Vercel.
 4. Point the frontend at that deployment instead of plain GitHub Pages.
 
+When authenticated sync is configured:
+
+- `Sync now` pushes the active profile to GitHub.
+- `Pull profiles` fetches repo-backed profiles into the local app.
+- On a fresh device with only an empty default profile, the app attempts an automatic pull after sign-in.
+
 ## Notes
 
 - The app follows your provided week labels `0-12`, which creates 13 labeled weeks.
