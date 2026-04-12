@@ -106,6 +106,12 @@ h3 {
   gap: 12px;
 }
 
+.sync-actions {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+}
+
 .group-title-row {
   justify-content: space-between;
   align-items: baseline;

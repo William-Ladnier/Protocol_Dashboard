@@ -21,6 +21,10 @@ Local-first static dashboard for a structured lion's mane self-experiment.
 - `index.html`: app shell
 - `styles.css`: responsive UI styling
 - `app.js`: data model, persistence, aggregation, charts, and protocol logic
+- `sync-client.js`: frontend hooks for future authenticated GitHub sync
+- `api/`: serverless auth and sync endpoints for v2
+- `lib/`: shared GitHub/session/profile helpers for v2
+- `docs/authenticated-sync-plan.md`: concrete v2 architecture and setup notes
 
 ## How to use
 
@@ -34,6 +38,17 @@ Local-first static dashboard for a structured lion's mane self-experiment.
 ## Mobile workflow
 
 For iPhone use, the simplest path is to open the static app in Safari and optionally add it to the home screen.
+
+## Authenticated Sync V2
+
+The repo now includes an initial scaffold for a GitHub-authenticated sync version that can replace manual import/export after configuration.
+
+To finish that v2 path, you still need to:
+
+1. Create and configure a GitHub App with contents write permission.
+2. Set the environment variables from `.env.example`.
+3. Deploy the app to a platform that supports serverless functions, such as Vercel.
+4. Point the frontend at that deployment instead of plain GitHub Pages.
 
 ## Notes
 

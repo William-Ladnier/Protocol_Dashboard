@@ -1402,3 +1402,12 @@ function getProtocolDoseGuidance(weekNumber) {
   }
   return match;
 }
+
+window.protocolDashboardApp = {
+  getCurrentProfile() {
+    return structuredClone(currentProfile());
+  },
+  getProfiles() {
+    return structuredClone(state.profiles);
+  },
+};
