@@ -1,3 +1,4 @@
+import { buildGitHubSession, exchangeCodeForUserToken, fetchGitHubUser } from "../../lib/github-auth.js";
 import { writeSession } from "../../lib/session.js";
 
 export default async function handler(req, res) {
@@ -10,38 +11,15 @@ export default async function handler(req, res) {
     return;
   }
 
-  const tokenResponse = await fetch("https://github.com/login/oauth/access_token", {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      client_id: clientId,
-      client_secret: clientSecret,
-      code,
-    }),
-  });
+  try {
+    const tokenPayload = await exchangeCodeForUserToken(code);
+    const userPayload = await fetchGitHubUser(tokenPayload.access_token);
 
-  const tokenPayload = await tokenResponse.json();
-  if (!tokenPayload.access_token) {
-    res.status(400).send("GitHub token exchange failed.");
+    writeSession(res, buildGitHubSession(tokenPayload, userPayload));
+  } catch (error) {
+    res.status(error?.status || 400).send(error.message || "GitHub token exchange failed.");
     return;
   }
-
-  const userResponse = await fetch("https://api.github.com/user", {
-    headers: {
-      Accept: "application/vnd.github+json",
-      Authorization: `Bearer ${tokenPayload.access_token}`,
-      "User-Agent": "protocol-dashboard",
-    },
-  });
-  const userPayload = await userResponse.json();
-
-  writeSession(res, {
-    accessToken: tokenPayload.access_token,
-    githubLogin: userPayload.login || "",
-  });
 
   res.writeHead(302, { Location: "/" });
   res.end();

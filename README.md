@@ -55,6 +55,7 @@ When authenticated sync is configured:
 - `Sync now` pushes the active profile to GitHub.
 - `Pull profiles` fetches repo-backed profiles into the local app.
 - On a fresh device with only an empty default profile, the app attempts an automatic pull after sign-in.
+- Expiring GitHub user tokens are refreshed automatically during session checks and sync calls when a valid refresh token is available.
 
 ## Notes
 
