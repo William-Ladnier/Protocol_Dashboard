@@ -110,6 +110,10 @@
                         <span>Lion's mane dose (capsules)</span>
                         <input id="lionsManeDoseInput" name="lionsManeDose" type="number" min="0" step="1" />
                       </label>
+                      <label>
+                        <span>WHOOP Recovery (%)</span>
+                        <input id="whoopRecoveryInput" name="whoopRecovery" type="number" min="0" max="100" step="1" />
+                      </label>
                       <label class="slider-field">
                         <span>Morning energy</span>
                         <input id="morningEnergyInput" name="morningEnergy" type="range" min="1" max="10" value="5" />
@@ -366,6 +370,11 @@
                   <div class="chart-legend" id="inflammationLegend"></div>
                   <canvas id="inflammationChart" width="640" height="240"></canvas>
                 </article>
+                <article class="chart-card">
+                  <h3>WHOOP Recovery</h3>
+                  <div class="chart-legend" id="whoopLegend"></div>
+                  <canvas id="whoopChart" width="640" height="240"></canvas>
+                </article>
               </div>
             </section>
 
@@ -387,6 +396,7 @@
                       <th>Energy Mid</th>
                       <th>Energy PM</th>
                       <th>Variability</th>
+                      <th>WHOOP</th>
                       <th>Sleep quality</th>
                       <th>Recovery</th>
                       <th>Joint stiffness</th>

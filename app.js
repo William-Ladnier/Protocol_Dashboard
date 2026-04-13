@@ -51,6 +51,7 @@ const elements = {
   briefChecklist: document.getElementById("briefChecklist"),
   entryStatusPill: document.getElementById("entryStatusPill"),
   lionsManeDoseInput: document.getElementById("lionsManeDoseInput"),
+  whoopRecoveryInput: document.getElementById("whoopRecoveryInput"),
   supplementFields: document.getElementById("supplementFields"),
   supplementNote: document.getElementById("supplementNote"),
   morningEnergyInput: document.getElementById("morningEnergyInput"),
@@ -93,6 +94,7 @@ const elements = {
     memory: document.getElementById("memoryLegend"),
     sleep: document.getElementById("sleepLegend"),
     inflammation: document.getElementById("inflammationLegend"),
+    whoop: document.getElementById("whoopLegend"),
   },
   exportDataButton: document.getElementById("exportDataButton"),
   importFileInput: document.getElementById("importFileInput"),
@@ -104,6 +106,7 @@ const elements = {
     memory: document.getElementById("memoryChart"),
     sleep: document.getElementById("sleepChart"),
     inflammation: document.getElementById("inflammationChart"),
+    whoop: document.getElementById("whoopChart"),
   },
 };
 
@@ -526,6 +529,7 @@ function handleSaveEntry(event) {
     weekNumber: derived.weekNumber,
     phase: derived.phase,
     lionsManeDose: toNumberOrNull(formData.get("lionsManeDose")),
+    whoopRecovery: toNumberOrNull(formData.get("whoopRecovery")),
     morningEnergy: toNumberOrNull(formData.get("morningEnergy")),
     middayEnergy: toNumberOrNull(formData.get("middayEnergy")),
     lateAfternoonEnergy: toNumberOrNull(formData.get("lateAfternoonEnergy")),
@@ -591,6 +595,7 @@ function loadEntryForSelectedDate() {
   elements.startDateInput.value = currentSettings().startDate;
   elements.dateInput.value = existing.date;
   elements.lionsManeDoseInput.value = existing.lionsManeDose ?? "";
+  elements.whoopRecoveryInput.value = existing.whoopRecovery ?? "";
   setRangeValue(elements.morningEnergyInput, existing.morningEnergy ?? 5);
   setRangeValue(elements.middayEnergyInput, existing.middayEnergy ?? 5);
   setRangeValue(elements.lateAfternoonEnergyInput, existing.lateAfternoonEnergy ?? 5);
@@ -738,6 +743,7 @@ function summarizeEntries(entries) {
   return {
     brainFog: average(entries.map((entry) => entry.brainFog)),
     lionsManeDose: average(entries.map((entry) => entry.lionsManeDose)),
+    whoopRecovery: average(entries.map((entry) => entry.whoopRecovery)),
     morningEnergy: average(entries.map((entry) => entry.morningEnergy)),
     middayEnergy: average(entries.map((entry) => entry.middayEnergy)),
     lateAfternoonEnergy: average(entries.map((entry) => entry.lateAfternoonEnergy)),
@@ -871,6 +877,7 @@ function renderPhaseComparison(phaseAverages) {
       <p>${phase.count} logged days</p>
       <p>Brain fog: ${formatMaybeNumber(phase.metrics.brainFog)}</p>
       <p>Energy variability: ${formatMaybeNumber(phase.metrics.energyVariability)}</p>
+      <p>WHOOP Recovery: ${formatMaybeNumber(phase.metrics.whoopRecovery)}</p>
       <p>Sleep quality: ${formatMaybeNumber(phase.metrics.sleepQuality)}</p>
       <p>Lion's mane: ${formatMaybeNumber(phase.metrics.lionsManeDose)} capsules</p>
       <p>Reaction time: ${formatMaybeNumber(phase.metrics.reactionTime)}</p>
@@ -900,6 +907,7 @@ function renderWeeklyTable(weeklySummaries) {
       <td>${formatMaybeNumber(summary.metrics.middayEnergy)}</td>
       <td>${formatMaybeNumber(summary.metrics.lateAfternoonEnergy)}</td>
       <td>${formatMaybeNumber(summary.metrics.energyVariability)}</td>
+      <td>${formatMaybeNumber(summary.metrics.whoopRecovery)}</td>
       <td>${formatMaybeNumber(summary.metrics.sleepQuality)}</td>
       <td>${formatMaybeNumber(summary.metrics.recoveryQuality)}</td>
       <td>${formatMaybeNumber(summary.metrics.jointStiffness)}</td>
@@ -1001,6 +1009,14 @@ function renderCharts(entries, rollingData) {
   };
   renderChartLegend(elements.legends.inflammation, inflammationConfig.series);
   drawLineChart(elements.charts.inflammation, inflammationConfig);
+
+  const whoopConfig = {
+    entries,
+    series: [{ label: "WHOOP Recovery %", color: "#2f6bbd", values: entries.map((entry) => entry.whoopRecovery) }],
+    yLabel: "%",
+  };
+  renderChartLegend(elements.legends.whoop, whoopConfig.series);
+  drawLineChart(elements.charts.whoop, whoopConfig);
 }
 
 function renderChartLegend(container, series) {
