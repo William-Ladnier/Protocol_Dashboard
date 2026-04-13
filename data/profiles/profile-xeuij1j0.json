@@ -36,25 +36,23 @@
       "phase": "Baseline",
       "lionsManeDose": null,
       "whoopRecovery": null,
-      "morningEnergy": 2,
-      "middayEnergy": 5,
-      "lateAfternoonEnergy": 5,
-      "energyVariability": 3,
+      "morningEnergy": 5,
+      "middayEnergy": 7,
+      "lateAfternoonEnergy": 6,
+      "energyVariability": 2,
       "brainFog": 5,
       "didCognitiveTest": true,
-      "reactionTime": null,
-      "memoryScore": 475,
+      "reactionTime": 309,
+      "memoryScore": 6,
       "sleepDuration": null,
-      "sleepQuality": 3,
-      "awakenings": 4,
+      "sleepQuality": 8,
+      "awakenings": null,
       "workoutPerformed": false,
       "recoveryQuality": 5,
-      "jointStiffness": 4,
-      "anomalyTags": [
-        "Poor sleep"
-      ],
+      "jointStiffness": 5,
+      "anomalyTags": [],
       "notes": "",
-      "createdAt": "2026-04-13T12:59:24.855Z"
+      "createdAt": "2026-04-13T20:09:09.999Z"
     }
   ]
 }
