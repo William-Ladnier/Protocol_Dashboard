@@ -11,7 +11,7 @@
     <button class="secondary" id="syncNowButton" type="button" disabled>Sync now</button>
     <button class="secondary" id="pullProfilesButton" type="button" disabled>Pull profiles</button>
     <button class="secondary" id="signOutGitHubButton" type="button" hidden>Sign out</button>
-    <p class="muted" id="syncStatusText">Sync backend not connected yet.</p>
+    <p class="muted" id="syncStatusText">Saved entries will sync automatically after GitHub sign-in.</p>
   `;
   root.appendChild(group);
 
@@ -21,6 +21,63 @@
   const pullButton = document.getElementById("pullProfilesButton");
   const statusText = document.getElementById("syncStatusText");
   let attemptedAutoPull = false;
+  let syncInFlight = null;
+
+  async function syncCurrentProfile({ reason = "manual", silent = false } = {}) {
+    if (!window.protocolDashboardApp) {
+      return { ok: false, reason: "missing-app" };
+    }
+    if (syncInFlight) {
+      return syncInFlight;
+    }
+
+    const profile = window.protocolDashboardApp.getCurrentProfile();
+    if (!profile?.id) {
+      return { ok: false, reason: "missing-profile" };
+    }
+
+    if (!silent) {
+      statusText.textContent =
+        reason === "entry-save" ? "Saving and syncing entry..." : `Syncing ${profile.name}...`;
+    }
+
+    syncInFlight = (async () => {
+      try {
+        const response = await fetch("/api/sync/push", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ profile }),
+        });
+
+        if (response.status === 401) {
+          await refreshSession();
+          throw new Error("Unauthenticated");
+        }
+        if (!response.ok) {
+          throw new Error("Sync failed");
+        }
+
+        const result = { ok: true, profile };
+        statusText.textContent =
+          reason === "entry-save"
+            ? `Saved and synced ${profile.name}.`
+            : `Synced ${profile.name} to GitHub.`;
+        return result;
+      } catch (error) {
+        if (!silent) {
+          statusText.textContent =
+            reason === "entry-save"
+              ? "Entry saved locally, but sync failed. Check auth/configuration."
+              : "Sync failed. Check auth/configuration.";
+        }
+        return { ok: false, error };
+      } finally {
+        syncInFlight = null;
+      }
+    })();
+
+    return syncInFlight;
+  }
 
   async function pullProfiles({ silent = false } = {}) {
     if (!window.protocolDashboardApp) {
@@ -62,7 +119,7 @@
       }
       const payload = await response.json();
       if (payload.authenticated) {
-        statusText.textContent = `Signed in to GitHub as ${payload.profile.githubLogin}.`;
+        statusText.textContent = `Signed in to GitHub as ${payload.profile.githubLogin}. Saved entries sync automatically.`;
         signInButton.hidden = true;
         signOutButton.hidden = false;
         syncButton.disabled = false;
@@ -80,7 +137,7 @@
           }
         }
       } else {
-        statusText.textContent = "Sign in with GitHub to enable repo-backed sync.";
+        statusText.textContent = "Sign in with GitHub to sync saved entries across devices.";
         signInButton.hidden = false;
         signOutButton.hidden = true;
         syncButton.disabled = true;
@@ -110,24 +167,14 @@
   });
 
   syncButton.addEventListener("click", async () => {
-    if (!window.protocolDashboardApp) {
+    await syncCurrentProfile({ reason: "manual", silent: false });
+  });
+
+  window.addEventListener("protocol-dashboard:profile-saved", async (event) => {
+    if (syncButton.disabled) {
       return;
     }
-    statusText.textContent = "Syncing current profile...";
-    try {
-      const profile = window.protocolDashboardApp.getCurrentProfile();
-      const response = await fetch("/api/sync/push", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ profile }),
-      });
-      if (!response.ok) {
-        throw new Error("Sync failed");
-      }
-      statusText.textContent = `Synced ${profile.name} to GitHub.`;
-    } catch {
-      statusText.textContent = "Sync failed. Check auth/configuration.";
-    }
+    await syncCurrentProfile({ reason: event.detail?.reason || "save", silent: false });
   });
 
   refreshSession();

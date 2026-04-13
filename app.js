@@ -144,6 +144,7 @@ function bindEvents() {
       };
     });
     saveState();
+    dispatchProfileSaved("start-date");
     loadEntryForSelectedDate();
     updateDerivedEntryMeta();
     renderAll();
@@ -256,6 +257,17 @@ function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
+function dispatchProfileSaved(reason) {
+  window.dispatchEvent(
+    new CustomEvent("protocol-dashboard:profile-saved", {
+      detail: {
+        reason,
+        profileId: currentProfile()?.id || null,
+      },
+    }),
+  );
+}
+
 function hydrateFormFromState() {
   renderProfileControls();
   elements.startDateInput.value = currentSettings().startDate;
@@ -348,6 +360,7 @@ function createProfileFromPrompt() {
   state.profiles.push(profile);
   state.activeProfileId = profile.id;
   saveState();
+  dispatchProfileSaved("profile-create");
   hydrateFormFromState();
   renderAll();
 }
@@ -364,6 +377,7 @@ function renameActiveProfileFromPrompt() {
   }
   profile.name = name;
   saveState();
+  dispatchProfileSaved("profile-rename");
   renderProfileControls();
 }
 
@@ -555,6 +569,7 @@ function handleSaveEntry(event) {
 
   currentProfile().entries = upsertEntry(currentEntries(), entry).sort((a, b) => a.date.localeCompare(b.date));
   saveState();
+  dispatchProfileSaved("entry-save");
   loadEntryForSelectedDate();
   renderAll();
 }
