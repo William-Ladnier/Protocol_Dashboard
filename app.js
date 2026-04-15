@@ -1369,6 +1369,43 @@ function uniqueProfileName(baseName) {
   return candidate;
 }
 
+function normalizeProfileName(name) {
+  return (name || "").trim().toLowerCase();
+}
+
+function hasProfileEntries(profile) {
+  return Array.isArray(profile?.entries) && profile.entries.length > 0;
+}
+
+function pruneStaleDuplicateProfiles(referenceProfile) {
+  const normalizedName = normalizeProfileName(referenceProfile.name);
+  const referenceStartDate = referenceProfile.settings?.startDate || "";
+  let activeProfileWasRemoved = false;
+
+  state.profiles = state.profiles.filter((profile) => {
+    if (profile.id === referenceProfile.id) {
+      return true;
+    }
+
+    const sameName = normalizeProfileName(profile.name) === normalizedName;
+    const sameStartDate = (profile.settings?.startDate || "") === referenceStartDate;
+    const isEmptyDuplicate = !hasProfileEntries(profile);
+
+    if (sameName && sameStartDate && isEmptyDuplicate) {
+      if (state.activeProfileId === profile.id) {
+        activeProfileWasRemoved = true;
+      }
+      return false;
+    }
+
+    return true;
+  });
+
+  if (activeProfileWasRemoved) {
+    state.activeProfileId = referenceProfile.id;
+  }
+}
+
 function slugifyName(value) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "profile";
 }
@@ -1452,7 +1489,33 @@ window.protocolDashboardApp = {
         ...imported.settings,
       };
       existing.entries = mergeEntriesByDate(existing.entries || [], imported.entries || []);
+      pruneStaleDuplicateProfiles(existing);
       state.activeProfileId = existing.id;
+      saveState();
+      hydrateFormFromState();
+      renderAll();
+      return true;
+    }
+
+    const staleNameMatch = state.profiles.find((profile) => {
+      return (
+        profile.id !== imported.id &&
+        normalizeProfileName(profile.name) === normalizeProfileName(imported.name) &&
+        (profile.settings?.startDate || "") === (imported.settings?.startDate || "") &&
+        !hasProfileEntries(profile)
+      );
+    });
+
+    if (staleNameMatch) {
+      staleNameMatch.id = imported.id;
+      staleNameMatch.name = imported.name || staleNameMatch.name;
+      staleNameMatch.settings = {
+        ...staleNameMatch.settings,
+        ...imported.settings,
+      };
+      staleNameMatch.entries = mergeEntriesByDate(staleNameMatch.entries || [], imported.entries || []);
+      pruneStaleDuplicateProfiles(staleNameMatch);
+      state.activeProfileId = staleNameMatch.id;
       saveState();
       hydrateFormFromState();
       renderAll();
@@ -1461,6 +1524,7 @@ window.protocolDashboardApp = {
 
     imported.name = uniqueProfileName(imported.name);
     state.profiles.push(imported);
+    pruneStaleDuplicateProfiles(imported);
     state.activeProfileId = imported.id;
     saveState();
     hydrateFormFromState();
