@@ -105,6 +105,31 @@
       "anomalyTags": [],
       "notes": "",
       "createdAt": "2026-04-15T11:56:50.997Z"
+    },
+    {
+      "date": "2026-04-16",
+      "startDate": "2026-04-12",
+      "weekNumber": 0,
+      "phase": "Baseline",
+      "lionsManeDose": null,
+      "whoopRecovery": null,
+      "morningEnergy": 5,
+      "middayEnergy": 5,
+      "lateAfternoonEnergy": 5,
+      "energyVariability": 0,
+      "brainFog": 6,
+      "didCognitiveTest": true,
+      "reactionTime": 417,
+      "memoryScore": 4,
+      "sleepDuration": null,
+      "sleepQuality": 8,
+      "awakenings": null,
+      "workoutPerformed": false,
+      "recoveryQuality": 5,
+      "jointStiffness": 5,
+      "anomalyTags": [],
+      "notes": "",
+      "createdAt": "2026-04-16T01:52:05.425Z"
     }
   ]
 }
