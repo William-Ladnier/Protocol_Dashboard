@@ -115,8 +115,8 @@
       "whoopRecovery": null,
       "morningEnergy": 8,
       "middayEnergy": 7,
-      "lateAfternoonEnergy": 5,
-      "energyVariability": 3,
+      "lateAfternoonEnergy": 6,
+      "energyVariability": 2,
       "brainFog": 6,
       "didCognitiveTest": true,
       "reactionTime": 417,
@@ -129,7 +129,7 @@
       "jointStiffness": 6,
       "anomalyTags": [],
       "notes": "",
-      "createdAt": "2026-04-16T12:16:44.251Z"
+      "createdAt": "2026-04-16T19:16:53.632Z"
     }
   ]
 }
