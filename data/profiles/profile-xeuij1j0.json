@@ -269,8 +269,8 @@
       "energyVariability": 2,
       "brainFog": 5,
       "didCognitiveTest": true,
-      "reactionTime": null,
-      "memoryScore": null,
+      "reactionTime": 331,
+      "memoryScore": 6,
       "sleepDuration": 8,
       "sleepQuality": 8,
       "awakenings": 1,
@@ -279,7 +279,7 @@
       "jointStiffness": 3,
       "anomalyTags": [],
       "notes": "",
-      "createdAt": "2026-04-24T16:40:19.752Z"
+      "createdAt": "2026-04-24T16:45:03.827Z"
     }
   ]
 }
