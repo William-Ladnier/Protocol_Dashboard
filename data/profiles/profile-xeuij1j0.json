@@ -314,9 +314,9 @@
       "lionsManeDose": null,
       "whoopRecovery": null,
       "morningEnergy": 5,
-      "middayEnergy": 5,
+      "middayEnergy": 6,
       "lateAfternoonEnergy": 5,
-      "energyVariability": 0,
+      "energyVariability": 1,
       "brainFog": 5,
       "didCognitiveTest": false,
       "reactionTime": null,
@@ -329,7 +329,7 @@
       "jointStiffness": 5,
       "anomalyTags": [],
       "notes": "",
-      "createdAt": "2026-04-30T17:36:28.501Z"
+      "createdAt": "2026-04-30T17:37:00.705Z"
     }
   ]
 }
