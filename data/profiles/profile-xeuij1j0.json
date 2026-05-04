@@ -361,25 +361,30 @@
       "startDate": "2026-04-12",
       "weekNumber": 3,
       "phase": "Intervention",
-      "lionsManeDose": 2,
+      "lionsManeDose": null,
       "whoopRecovery": null,
-      "morningEnergy": 2,
+      "morningEnergy": 5,
       "middayEnergy": 5,
       "lateAfternoonEnergy": 5,
-      "energyVariability": 3,
+      "energyVariability": 0,
       "brainFog": 5,
       "didCognitiveTest": true,
-      "reactionTime": null,
-      "memoryScore": null,
-      "sleepDuration": 6,
-      "sleepQuality": 4,
+      "reactionTime": 265,
+      "memoryScore": 5,
+      "sleepDuration": null,
+      "sleepQuality": 8,
       "awakenings": null,
       "workoutPerformed": false,
       "recoveryQuality": 5,
-      "jointStiffness": 6,
-      "anomalyTags": [],
-      "notes": "",
-      "createdAt": "2026-05-04T17:47:16.760Z"
+      "jointStiffness": 5,
+      "anomalyTags": [
+        "Poor sleep",
+        "Diet deviation",
+        "High stress",
+        "Schedule disruption"
+      ],
+      "notes": "Trying to buy house, pack, sell, coordinate move, and trip to PA",
+      "createdAt": "2026-05-04T17:52:17.892Z"
     }
   ]
 }
