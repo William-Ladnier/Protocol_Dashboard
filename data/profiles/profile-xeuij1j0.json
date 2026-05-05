@@ -385,6 +385,31 @@
       ],
       "notes": "Trying to buy house, pack, sell, coordinate move, and trip to PA",
       "createdAt": "2026-05-04T17:52:17.892Z"
+    },
+    {
+      "date": "2026-05-05",
+      "startDate": "2026-04-12",
+      "weekNumber": 3,
+      "phase": "Intervention",
+      "lionsManeDose": 2,
+      "whoopRecovery": null,
+      "morningEnergy": 8,
+      "middayEnergy": 5,
+      "lateAfternoonEnergy": 5,
+      "energyVariability": 3,
+      "brainFog": 5,
+      "didCognitiveTest": false,
+      "reactionTime": null,
+      "memoryScore": null,
+      "sleepDuration": 7,
+      "sleepQuality": 7,
+      "awakenings": 1,
+      "workoutPerformed": false,
+      "recoveryQuality": 5,
+      "jointStiffness": 3,
+      "anomalyTags": [],
+      "notes": "",
+      "createdAt": "2026-05-05T13:22:36.656Z"
     }
   ]
 }
